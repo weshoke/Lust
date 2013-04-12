@@ -143,7 +143,7 @@ Sometimes template definitions are short or one-off definitions that aren't sign
 
 
 ## Conditions
-The @if condition takes a boolean expression and applies a template if it evaluates to true.  If there is a corresponding else template, then it will be applied if the expression evaluates to false
+The @if condition takes a boolean expression and applies a template or value if it evaluates to true.  If there is a corresponding else template/value, then it will be applied if the expression evaluates to false
 
 ```lua
 -- conditional templates have a conditional test followed by a template application
@@ -154,6 +154,24 @@ local temp = {
 }
 local model = { x=1 } 	-- res: "hello"
 local model = { } 		-- res: ""
+```
+
+```lua
+-- @if(?(x)) evaluates x in the model, and then checks if the result is a valid template name
+-- this example also demonstrates using dynamically evalutated template application:
+local temp = {
+	[[@if(?(op))<(op)>]],
+	child = "I am a child",
+}
+local model = { op="child" }
+-- res: "I am a child"
+```
+
+```lua
+-- using else and inline templates:
+local temp = [[@if(x)<{{hello}}>else<{{bye bye}}>]]
+local model = { x=1 }	-- res: "hello"
+local mdoel = {  }		-- res: "bye bye"
 ```
 
 
