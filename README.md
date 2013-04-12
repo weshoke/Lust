@@ -124,6 +124,14 @@ Lust{
 ```
 
 ```lua
+-- the symbol . can be used to explicitly refer to the current environment:
+Lust{
+	[[@child == @.:child]],
+	child = [[$1 child]],
+}:gen{ "hello" } -- res: "hello child == hello child"
+```
+
+```lua
 -- subtemplate paths can mix static and dynamic terms:
 Lust{[[@child.(x), @(y).grandchild, @(a.b)]], 
 	child "$1 to child",
@@ -134,6 +142,14 @@ Lust{[[@child.(x), @(y).grandchild, @(a.b)]],
 	"hello", 
 	a = { b="child" } 
 } -- res: "hello to grandchild, hello to grandchild, hello to child"
+```
+
+```lua
+-- child environments can be specified using multi-part paths:
+Lust{
+	[[@a.1.foo:child]],
+	child = [[$. child]],
+}:gen{ a={ { foo="hello" } } } -- res: "hello child"
 ```
 
 ```lua
