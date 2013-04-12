@@ -68,7 +68,7 @@ Lust[[$(x.y).1]]:gen{ x={ y="foo" }, foo={"hello"} } -- res: "hello"
 
 
 ### Template Application ###
-Template application applies a template to a particular environment.  The template invocation operator is indicated by the @ symbol.  In the simple case of applying a template to the current environment, template application looks like
+Template application applies a template to a particular environment.  The template invocation operator is indicated by the @ symbol.
 
 ```lua
 -- the @name invokes a statically named sub-template:
@@ -78,41 +78,75 @@ temp.child = "$1 to child"
 temp:gen{"hello"} -- res: "hello to child"
 ```
 
-which would apply the templated named "thetemplate" to the current environment.  While useful, the more typical case is to apply a template to a value in the current environment.  This looks like:
-
+```lua
+-- subtemplates can also be specified in the constructor-table:
+Lust{
+	[[@child]],
+	child = {
+		"$1 to child",
+	},
+}:gen{"hello"}	-- res: "hello to child"
 ```
-@field:thetemplate
-```
-
-The difference from the previous example is that there is now a value name followed by a ':' before the template name where ':' apply what preceded to what follows.  As with stringification, it's possible to index down the hierarchy of the environment using the '.' operator.  For example:
-
-```
-@field.subfield:thetemplate
-```
-
-### Template Namespacing  ###
-When a template is added to a Lust object, it's given a name.  As when indexing into the environment, namespaces of templates can be setup using the '.' operator.
 
 ```lua
+-- subtemplate invocations can use < > to avoid ambiguity:
 Lust{
-	[1] = "@growl -> @howl",
-	gowl = "grrrrr @exclaim",
-	["growl.exclaim"] = "^^^^^",
-	howl = "ooowww @exclaim",
-	["howl.exclaim"] = "~~~~~~",
-}
+	[[@<child>hood]],
+	child = {
+		"$1 to child",
+	},
+}:gen{"hello"} -- res: "hello to childhood"
 ```
 
-In this code, there are five templates defined with two template namespaces that each have a subtemplate.  The two namespaces are "growl" and "howl".  Notice that in both the growl and howl template the template application operator calls the "exclaim" template and there are two possible templates that could be references.  With template namespaces and the template application operator, Lust looks for the most specific template first and if not found contiues looking for a more general template until one is found or there are no more template names to look for and an error is generated.  As a result, the "@exclaim" in the template "growl" will cause Lust to first look for the template name "growl.exclaim" and if it doesn't exist it will then look for the template "exclaim".  Since "growl.exclaim" does exist, it will be used.  This logic applies equally to the case of "@exclaim" in the "howl" template".  Rendering out with the templates above will generate the result
+```lua
+-- subtemplates with subtemplates:
+Lust{
+	[[@child, @child.grandchild]],
+	child = {
+		"$1 to child",
+		grandchild = "$1 to grandchild",
+	},
+}:gen{"hello"} -- res: "hello to child, hello to grandchild"
+```
 
-	grrrrr ^^^^^ -> ooowww ~~~~~~
-	
-If we redined the "growl" template to be "grrrrr @howl.exclaim" instead, the result would be
+```lua
+-- subtemplates with subtemplates (alternative naming):
+Lust{
+	[[@child, @child.grandchild]],
+	child = "$1 to child",
+	["child.grandchild"] = "$1 to grandchild",
+}:gen{"hello"} -- res: "hello to child, hello to grandchild"
+```
 
-	grrrrr ~~~~~~ -> ooowww ~~~~~~
+```lua
+-- subtemplate names can also be resolved dynamically, according to model values, using (x):
+Lust{
+	[[@(x), @(y)]],
+	child1 = "hello world",
+	child2 = "hi"
+}:gen{ x="child1", y="child2" } -- res: "hello world, hi"
+```
 
-instead because Lust first looks for "growl.howl.exclaim", which it doesn't find, and then "howl.exclaim", which does exist and gets used.
+```lua
+-- subtemplate paths can mix static and dynamic terms:
+Lust{[[@child.(x), @(y).grandchild, @(a.b)]], 
+	child "$1 to child",
+	["child.grandchild"] = "$1 to grandchild",
+}:gen{ 
+	x="grandchild", 
+	y="child", 
+	"hello", 
+	a = { b="child" } 
+} -- res: "hello to grandchild, hello to grandchild, hello to child"
+```
 
+```lua
+-- the environment passed to a subtemplate can be specifed as a child of the current environment:
+Lust{
+	[[@1:child @two:child]],
+	child = [[$. child]],
+}:{ "one", two="two" } -- res: "one child two child"
+```
 
 ### Dynamic dispatch
 Dynamic dispatch is one of the most powerful features of Lust because it enables stringification and template application operations to be defined in terms of runtime information in the current environment instead of statically when the template is written.  Careful use of dynamic dispatch can dramatically simplify complex template interdependencies.
