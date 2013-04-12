@@ -88,22 +88,17 @@ local model = { x={ y="foo" }, foo={"hello"} }
 -- res: "hello"
 ```
 
-In some cases, however, it may be desirable to render a '.' character after the stringification operator, but since the syntax uses '.' to lookup subfields, this isn't possible without delimiting the range of characters Lust should interpret for a particular operation.  Operators can be explicitly delimited by with the '<' and '>' characters.  
-
-```lua
--- '.' operators can be excluded from a selection by using <x> delimiters
-local temp = [[$<x>.baz]]
-local model = { x="foo" }
--- res: "foo.baz"
-```
-
 
 
 ### Template Application ###
 Template application applies a template to a particular environment.  The template invocation operator is indicated by the @ symbol.  In the simple case of applying a template to the current environment, template application looks like
 
-```
-@thetemplate
+```lua
+-- the @name invokes a statically named sub-template:
+local temp = Lust[[@child]]
+-- define a subtemplate:
+temp.child = "$1 to child"
+temp:gen{"hello"} -- res: "hello to child"
 ```
 
 which would apply the templated named "thetemplate" to the current environment.  While useful, the more typical case is to apply a template to a value in the current environment.  This looks like:
