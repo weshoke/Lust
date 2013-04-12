@@ -40,50 +40,31 @@ Lust([[$1 $2]]):gen{ "hello", "world" } -- res: "hello world"
 
 ```lua
 -- $foo selects item from environment-as-dictionary:
-local temp = [[$foo $bar]]
-{ foo="hello", bar="world" }
--- res: "hello world"
+Lust[[$foo $bar]]:gen{ foo="hello", bar="world" } -- res: "hello world"
 ```
 
 ```lua
 -- $< > can be used to avoid ambiguity:
-local temp = [[$<1>2 $<foo>bar]]
-{ "hello", foo="world" }
--- res: "hello2 worldbar"
+Lust[[$<1>2 $<foo>bar]]:gen{ "hello", foo="world" } -- res: "hello2 worldbar"
 ```
 
 ```lua
 -- selections can be constructed as paths into the environment:
-local temp = [[$a.b.c $1.1.1]]
-{ a={ b={ c="hello" } }, { { "world" } } }
--- res: "hello world"
-
-local temp = [[$a.1 $1.b]]
-local model = { a={ "hello" }, { b="world" } }
--- res: "hello world"
+Lust[[$a.b.c $1.1.1]]:gen{ a={ b={ c="hello" } }, { { "world" } } } -- res: "hello world"
+Lust[[$a.1 $1.b]]:gen{ a={ "hello" }, { b="world" } } -- res: "hello world"
 ```
 
 ```lua
 -- the # symbol prints the length of an environment selection:
-local temp = [[$#.]]
-local model = { 1, 2, 3 }, "3")
-
-local temp = [[$#foo.bar]]
-local model = { foo={ bar={ 1, 2, 3 } } }
--- res: "3"
+Lust[[$#.]]:gen{ 1, 2, 3 } -- res: "3"
+Lust:[[$#foo.bar]]:gen{ foo={ bar={ 1, 2, 3 } } } -- res: "3"
 ```
 
 ```lua
 -- selections can be resolved dynamically using (x):
-local temp = [[$(x)]]
-local model = { x="foo", foo="hello" }
--- res: "hello"
-
-local temp = [[$(x.y).1]]
-local model = { x={ y="foo" }, foo={"hello"} }
--- res: "hello"
+Lust[[$(x)]]:gen{ x="foo", foo="hello" } -- res: "hello"
+Lust[[$(x.y).1]]:gen{ x={ y="foo" }, foo={"hello"} } -- res: "hello"
 ```
-
 
 
 ### Template Application ###
