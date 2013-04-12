@@ -174,6 +174,37 @@ local model = { x=1 }	-- res: "hello"
 local mdoel = {  }		-- res: "bye bye"
 ```
 
+```lua
+-- @if(#x > n) tests that the number of items in the model term 'x' is greater than n:
+local temp = [[@if(#. > "0")<{{at least one}}>]]
+local model = { "a", }	-- res: "at least one")
+local model = {  } 		-- res: ""
+```
+
+```lua
+-- compound conditions:
+local temp = [[@if(#x > "0" and #x < "5")<{{success}}>]]
+local model = { x={ "a", "b", "c", "d" } }		-- res: "success"
+local model = { x={ "a", "b", "c", "d", "e" } }	-- res: ""
+local model = { x={  } }						-- res: ""
+local model = { }								-- res: ""
+```
+
+```lua
+-- compound conditions:
+local temp = [[@if(x or not not not y)<{{success}}>else<{{fail}}>]]
+local model = { x=1 }		-- res: "success"
+local model = { x=1, y=1 }	-- res: "success"
+local model = { y=1 }		-- res: "fail"
+local model = { }			-- res: "success"
+```
+
+```lua
+-- compound conditions:
+local temp = [[@if(n*"2"+"1" > #x)<{{success}}>else<{{fail}}>]]
+local model = { n=3, x = { "a", "b", "c" } }	-- res: "success"
+local model = { n=1, x = { "a", "b", "c" } }	-- res: "fail"
+```
 
 
 ### Iteration
