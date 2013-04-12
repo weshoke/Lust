@@ -15,6 +15,12 @@ Lust is a templating system for Lua loosely based on Terrence Parr's [StringTemp
 * whitespace indentation preservation
 * insertion of separator tokens between strings generated via iteration
 
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
+
 
 High-Level Overview
 ---
@@ -265,7 +271,7 @@ local model = {
 
 The iter function takes a numeric argument and applies a template so many times.
 
-```
+```lua
 -- model used in the following examples
 local model = {
 	numbers = {
