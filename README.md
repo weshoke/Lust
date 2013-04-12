@@ -26,35 +26,77 @@ Lust Basics
 The most fundamental structures in Lust are *templates* and *environments*.  Templates are named strings, and environments represent the set of values a template has access to.  The environment of a template is just like the concept of scope in a programming language.  It provides a set of named values that can be referenced and operated on.
 
 ### Stringification ###
-Stringification takes a value and renders it directly into a string.  In Lust, the stringification operator is indicated by the $ symbol.  For example,
-	
-```
-$name is my name!
-```
-
-will look in the current environment for the value "name" and replace the characters "$name" with the value rendered as a string, which basically boils down to calling tostring() on the value if it exists.  If the value is nil, "$name" will be replaced with the empty string.
-
-Values further down the hierarchy of the current environment can be access using the '.' operator just like with Lua tables.  Given a datastructure
+Stringification takes a value and renders it directly into a string.  In Lust, the stringification operator is indicated by the $ symbol.  
 
 ```lua
-{ field={ subfield="Hi" }, another="thing" }
+-- $. applies the current environment:
+local temp = [[$.]]
+local model = "hello"
+-- res: "hello"
 ```
 
-the template
-
-```
-$field.subfield there!
-```
-
-will render "Hi there!" with the datastructure as its environment.
-
-In some cases, however, it may be desirable to render a '.' character after the stringification operator, but since the syntax uses '.' to lookup subfields, this isn't possible without delimiting the range of characters Lust should interpret for a particular operation.  Operators can be explicitly delimited by with the '<' and '>' characters.  Using the datastructure above, the template 
-
-```
-$<another>.process
+```lua
+-- $1 selects item from environment-as-array:
+local temp = [[$1 $2]]
+{ "hello", "world" }
+-- res: "hello world"
 ```
 
-will be rendered as "thing.process" because the stringification operator is wrapped in delimiting characters, so the '.' chartacter is not counted as part of the definition and is instead rendered as plain text.
+```lua
+-- $foo selects item from environment-as-dictionary:
+local temp = [[$foo $bar]]
+{ foo="hello", bar="world" }
+-- res: "hello world"
+```
+
+```lua
+-- $< > can be used to avoid ambiguity:
+local temp = [[$<1>2 $<foo>bar]]
+{ "hello", foo="world" }
+-- res: "hello2 worldbar"
+```
+
+```lua
+-- selections can be constructed as paths into the environment:
+local temp = [[$a.b.c $1.1.1]]
+{ a={ b={ c="hello" } }, { { "world" } } }
+-- res: "hello world"
+
+local temp = [[$a.1 $1.b]]
+local model = { a={ "hello" }, { b="world" } }
+-- res: "hello world"
+```
+
+```lua
+-- the # symbol prints the length of an environment selection:
+local temp = [[$#.]]
+local model = { 1, 2, 3 }, "3")
+
+local temp = [[$#foo.bar]]
+local model = { foo={ bar={ 1, 2, 3 } } }
+-- res: "3"
+```
+
+```lua
+-- selections can be resolved dynamically using (x):
+local temp = [[$(x)]]
+local model = { x="foo", foo="hello" }
+-- res: "hello"
+
+local temp = [[$(x.y).1]]
+local model = { x={ y="foo" }, foo={"hello"} }
+-- res: "hello"
+```
+
+In some cases, however, it may be desirable to render a '.' character after the stringification operator, but since the syntax uses '.' to lookup subfields, this isn't possible without delimiting the range of characters Lust should interpret for a particular operation.  Operators can be explicitly delimited by with the '<' and '>' characters.  
+
+```lua
+-- '.' operators can be excluded from a selection by using <x> delimiters
+local temp = [[$<x>.baz]]
+local model = { x="foo" }
+-- res: "foo.baz"
+```
+
 
 
 ### Template Application ###
