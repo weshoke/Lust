@@ -222,14 +222,18 @@ local model = {
 	}
 }
 -- result: "one two three "
+```
 
+```lua
 -- assigning mapped values a name in the environment
 local temp = [[@map{ n=numbers }:{{$n }}]]
 local model = {
 	numbers = { "one", "two", "three" }
 }
 -- result: "one two three "
+```
 
+```lua
 -- the _separator field can be used to insert elements between items:
 local temp = [[@map{ n=numbers, _separator=", " }:{{$n.name}}]]
 local model = {
@@ -240,7 +244,9 @@ local model = {
 	}
 }
 -- result: "one, two, three"
+```
 
+```lua
 -- _ can be used as a shorthand for _separator:
 local temp = [[@map{ n=numbers, _=", " }:{{$n.name}}]]
 local model = {
@@ -251,7 +257,9 @@ local model = {
 	}
 }
 -- result: "one, two, three"
+```
 
+```lua
 -- a map can iterate over multiple arrays in parallel
 local temp = [[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
 local model = {
@@ -265,7 +273,9 @@ local model = {
 	}
 }
 -- res: "a one, b two, c three"
+```
 
+```lua
 -- if parallel mapped items have different lengths, the longest is used:
 local temp = [[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
 local model = {
@@ -279,7 +289,9 @@ local model = {
 	}
 }
 -- res: "a one, b two, c three, d "
+```
 
+```lua
 -- if parallel mapped items are not arrays, they are repeated each time:
 local temp = [[@map{ a=letters, n=numbers, prefix="hello", count=#letters, _=", " }:{{$prefix $a $n.name of $count}}]]
 local model = {
@@ -293,7 +305,9 @@ local model = {
 	}
 }
 -- res: "hello a one of 4, hello b two of 4, hello c three of 4, hello d  of 4"
+```
 
+```lua
 -- the 'i1' and 'i0' fields are added automatically for one- and zero-based array indices:
 local temp = [[@map{ n=numbers }:{{$i0-$i1 $n.name }}]]
 local model = {
@@ -304,8 +318,9 @@ local model = {
 	}
 }
 -- res: "0-1 one 1-2 two 2-3 three "
+```
 
-
+```lua
 -- if the map only contains an un-named array, each item of the array becomes the environment applied in each iteration:
 local temp = [["@map{ ., _separator='", "' }:{{$name}}"]]
 local model = {
@@ -314,7 +329,9 @@ local model = {
 	{ name="three" },
 }
 -- res: '"one", "two", "three"'
+```
 
+```lua
 local temp = [[@map{ numbers, count=#numbers, _separator=", " }:{{$name of $count}}]]
 local model = {
 	numbers = {
@@ -338,23 +355,33 @@ local model = {
 		{ name="three" },
 	}
 }
+```
 
+```lua
 -- @iter can be used for an explicit number of repetitions:
 local temp = [[@iter{ "3" }:{{repeat $i1 }}]]
 -- res: "repeat 1 repeat 2 repeat 3 "
+```
 
+```lua
 -- again, _separator works:
 local temp = [[@iter{ "3", _separator=", " }:{{repeat $i1}}]]
 -- res: "repeat 1, repeat 2, repeat 3"
+```
 
+```lua
 -- @iter can take an array item; it will use the length of that item:
 local temp = [[@iter{ numbers, _separator=", " }:{{repeat $i1}}]]
 -- res: "repeat 1, repeat 2, repeat 3"
+```
 
+```lua
 -- @iter can take a range for start and end values:
 local temp = [[@iter{ ["2", "3"] }:{{repeat $i1 }}]]
 -- res: "repeat 2 repeat 3 "
+```
 
+```lua
 -- the range can also be determined by an array whose length gets used
 local temp = [[@iter{ ["2", numbers], _separator=", " }:{{repeat $i1}}]]
 -- res: "repeat 2, repeat 3"
