@@ -11,7 +11,7 @@ Lust is a templating system for Lua loosely based on Terrence Parr's [StringTemp
 * scoped templates
 * dynamic template dispatch based on runtime information
 * iteration through map and numeric loop mechanisms
-* conditional template invocation
+* conditional template application
 * whitespace indentation preservation
 * insertion of separator tokens between strings generated via iteration
 
@@ -142,10 +142,25 @@ Sometimes template definitions are short or one-off definitions that aren't sign
 ```
 
 
+## Conditions
+The @if condition takes a boolean expression and applies a template if it evaluates to true.  If there is a corresponding else template, then it will be applied if the expression evaluates to false
+
+```lua
+-- conditional templates have a conditional test followed by a template application
+-- @if(x) tests for the existence of x in the model
+local temp = {
+	[[@if(x)<greet>]],
+	greet = "hello",
+}
+local model = { x=1 } 	-- res: "hello"
+local model = { } 		-- res: ""
+```
+
+
 
 ### Iteration
 
-Lust has two main methods for creating iteration statements: a map function and numeric iteration.  For the map function, there are a variety of ways that it can be called depdening on the situation
+Lust has two main methods for creating iteration statements: a map function and numeric iteration.  For the @map function, there are a variety of ways that it can be called depdening on the situation
 
 ```lua
 -- @map can iterate over arrays in the environment:
@@ -263,7 +278,7 @@ local model = {
 ```
 
 
-The iter function takes a numeric argument and applies a template so many times.
+The @iter function takes a numeric argument and applies a template so many times.
 
 ```lua
 -- model used in the following examples
