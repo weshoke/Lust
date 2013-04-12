@@ -30,16 +30,12 @@ Stringification takes a value and renders it directly into a string.  In Lust, t
 
 ```lua
 -- $. applies the current environment:
-local temp = [[$.]]
-local model = "hello"
--- res: "hello"
+Lust([[$.]]):gen("hello") -- res: "hello"
 ```
 
 ```lua
 -- $1 selects item from environment-as-array:
-local temp = [[$1 $2]]
-{ "hello", "world" }
--- res: "hello world"
+Lust([[$1 $2]]):gen{ "hello", "world" } -- res: "hello world"
 ```
 
 ```lua
