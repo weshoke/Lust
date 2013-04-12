@@ -15,12 +15,6 @@ Lust is a templating system for Lua loosely based on Terrence Parr's [StringTemp
 * whitespace indentation preservation
 * insertion of separator tokens between strings generated via iteration
 
-```ruby
-require 'redcarpet'
-markdown = Redcarpet.new("Hello World!")
-puts markdown.to_html
-```
-
 
 High-Level Overview
 ---
@@ -42,7 +36,7 @@ will look in the current environment for the value "name" and replace the charac
 
 Values further down the hierarchy of the current environment can be access using the '.' operator just like with Lua tables.  Given a datastructure
 
-```
+```lua
 { field={ subfield="Hi" }, another="thing" }
 ```
 
@@ -85,7 +79,7 @@ The difference from the previous example is that there is now a value name follo
 ### Template Namespacing  ###
 When a template is added to a Lust object, it's given a name.  As when indexing into the environment, namespaces of templates can be setup using the '.' operator.
 
-```
+```lua
 Lust{
 	[1] = "@growl -> @howl",
 	gowl = "grrrrr @exclaim",
@@ -117,7 +111,7 @@ $(name) is my $field.(subname)
 
 with datastructure 
 
-```
+```lua
 {
 	name = "alfred",
 	subname = "bonkers",
@@ -153,7 +147,7 @@ Sometimes template definitions are short or one-off definitions that aren't sign
 
 Lust has two main methods for creating iteration statements: a map function and numeric iteration.  For the map function, there are a variety of ways that it can be called depdening on the situation
 
-```
+```lua
 -- @map can iterate over arrays in the environment:
 local temp = [[@map{ n=numbers }:{{$n.name }}]]
 local model = {
