@@ -82,9 +82,7 @@ temp:gen{"hello"} -- res: "hello to child"
 -- subtemplates can also be specified in the constructor-table:
 Lust{
 	[[@child]],
-	child = {
-		"$1 to child",
-	},
+	child = "$1 to child",
 }:gen{"hello"}	-- res: "hello to child"
 ```
 
@@ -92,9 +90,7 @@ Lust{
 -- subtemplate invocations can use < > to avoid ambiguity:
 Lust{
 	[[@<child>hood]],
-	child = {
-		"$1 to child",
-	},
+	child = "$1 to child",
 }:gen{"hello"} -- res: "hello to childhood"
 ```
 
