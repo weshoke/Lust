@@ -195,48 +195,6 @@ Lust{
 }:gen{} -- res: "hello world"
 ```
 
-### Dynamic dispatch
-Dynamic dispatch is one of the most powerful features of Lust because it enables stringification and template application operations to be defined in terms of runtime information in the current environment instead of statically when the template is written.  Careful use of dynamic dispatch can dramatically simplify complex template interdependencies.
-
-Dynamic dispatch is indicated with the '(' and ')' symbols and can be used for any part of a template or environment variable name.  The name within the '(' and ')' characters is looked up in the environment and used to construct a stringification or template application operator.  For example
-
-```
-$(name) is my $field.(subname)
-```
-
-with datastructure 
-
-```lua
-{
-	name = "alfred",
-	subname = "bonkers",
-	alfred = "hommie",
-	field = { bonkers="love" }
-}
-```
-
-containts two stringification operators, each with dynamic dispatch.  In the first case, "$(name)" will lookup the "name" value in the environment and use the value to lookup another value.  The second case of "$field.(subname)" will look up the value of "subname" in the environment and concatenate it with "field" to look up a nested value.  Applying the template to the above datastructure gives:
-
-	hommie is my love
-	
-Other examples of dynamic dispatch include:
-
-```
-$name.(another.name)
-@(template)
-@vals:(template)
-```
-
-
-### Inline templates
-Sometimes template definitions are short or one-off definitions that aren't significant enough to warrent writing as a separate named template.  Inline templates can be defined anywhere a template name would be used and are delimited by the '{{' and ''}}' symbols.
-
-```
-@{{Hi $name}}
-@person:{{Hi $name}}
-```
-
-
 ## Conditions
 The @if condition takes a boolean expression and applies a template or value if it evaluates to true.  If there is a corresponding else template/value, then it will be applied if the expression evaluates to false
 
