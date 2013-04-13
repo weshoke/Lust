@@ -172,7 +172,7 @@ Lust{
 
 ```lua
 -- subtemplates can be specified inline using @{{ }}:
-Lust([@foo.bar:{{$1 $2}}]]):gen{ foo={ bar={ "hello", "world" } } } -- res: "hello world"
+Lust([[@foo.bar:{{$1 $2}}]]):gen{ foo={ bar={ "hello", "world" } } } -- res: "hello world"
 ```
 
 ```lua
