@@ -16,6 +16,13 @@ Lust is a templating system for Lua loosely based on Terrence Parr's [StringTemp
 * insertion of separator tokens between strings generated via iteration
 
 
+### Authors
+Lust is developed by Wesley Smith and Graham Wakefield with the support of Cycling '74.
+
+### License
+Lust is licensed under the standard [MIT license](http://www.lua.org/license.html) just like the Lua Language.
+
+
 High-Level Overview
 ---
 In Lust, you author a set of templates, giving each one a name.  Templates can be grouped together by putting them in a common namespace.  To use the templates for string synthesis, a datastructure is passed to the Lust object, which initiates the synthesis process by applying the root template rule to the datastructure.  As the root rule invokes subtemplates, Lust walks the datastructure passed in by following the commands described by operators embedded in the templates.  Lust walks a datastructure either by iterating over arrays of values or by looking at named fields.
