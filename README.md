@@ -121,6 +121,7 @@ Lust{
 	child1 = "hello world",
 	child2 = "hi"
 }:gen{ x="child1", y="child2" } -- res: "hello world, hi"
+```
 
 ```lua
 -- the environment passed to a subtemplate can be specifed as a child of the current environment:
@@ -128,7 +129,6 @@ Lust{
 	[[@1:child @two:child]],
 	child = [[$. child]],
 }:{ "one", two="two" } -- res: "one child two child"
-```
 ```
 
 ```lua
