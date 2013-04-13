@@ -22,7 +22,7 @@ Lust is developed by Wesley Smith and Graham Wakefield with the support of Cycli
 ### License
 Lust is licensed under the standard [MIT license](http://www.lua.org/license.html) just like the Lua Language.
 
-## Dependencies
+### Dependencies
 Lust depends on the [Lua Parsing Expression Grammar (LPEG)](http://www.inf.puc-rio.br/~roberto/lpeg/) module.
 
 
