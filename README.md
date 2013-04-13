@@ -121,6 +121,14 @@ Lust{
 	child1 = "hello world",
 	child2 = "hi"
 }:gen{ x="child1", y="child2" } -- res: "hello world, hi"
+
+```lua
+-- the environment passed to a subtemplate can be specifed as a child of the current environment:
+Lust{
+	[[@1:child @two:child]],
+	child = [[$. child]],
+}:{ "one", two="two" } -- res: "one child two child"
+```
 ```
 
 ```lua
@@ -153,11 +161,38 @@ Lust{
 ```
 
 ```lua
--- the environment passed to a subtemplate can be specifed as a child of the current environment:
+-- subtemplates can be specified inline using @{{ }}:
+Lust([@foo.bar:{{$1 $2}}]]):gen{ foo={ bar={ "hello", "world" } } } -- res: "hello world"
+```
+
+```lua
+-- environments can also be specified dynamically
+-- the @{ } construction is similar to Lua table construction
+Lust([[@{ ., greeting="hello" }:{{$greeting $1.place}}]]):gen{ place="world" } -- res: "hello world"
+Lust([[@{ "hello", a.b.place }:{{$1 $2}}]]):gen{ a = { b = { place="world" } } } -- res: "hello world"
+Lust([[@{ 1, place=a.b }:{{$1 $place.1}}]]):gen{ "hello", a = { b = { "world" } } } -- res: "hello world"
+```
+
+```lua
+-- dynamic environments can contain arrays:
+Lust([[@{ args=["hello", a.b] }:{{$args.1 $args.2.1}}]]):gen{ a = { b = { "world" } } } -- res: "hello world"
+```
+
+```lua
+-- dynamic environments can contain subtemplate applications:
 Lust{
-	[[@1:child @two:child]],
-	child = [[$. child]],
-}:{ "one", two="two" } -- res: "one child two child"
+	[[@{ .:child, a=x:child.grandchild }:{{$1, $a}}]],
+	child = "$1 to child",
+	["child.grandchild"] = "$1 to grandchild",
+}:gen{ "hi", x = { "hello" } } -- res: "hi to child, hello to grandchild"
+```
+
+```lua
+-- dynamic environments can be nested:
+Lust{
+	[[@{ { "hello" }, foo={ bar="world" } }:sub]],
+	sub = [[$1.1 $foo.bar]],
+}:gen{} -- res: "hello world"
 ```
 
 ### Dynamic dispatch
