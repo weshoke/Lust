@@ -201,62 +201,61 @@ The @if condition takes a boolean expression and applies a template or value if 
 ```lua
 -- conditional templates have a conditional test followed by a template application
 -- @if(x) tests for the existence of x in the model
-local temp = {
+local temp = Lust{
 	[[@if(x)<greet>]],
 	greet = "hello",
 }
-local model = { x=1 } 	-- res: "hello"
-local model = { } 		-- res: ""
+temp:gen{ x=1 } 	-- res: "hello"
+temp:gen{ } 		-- res: ""
 ```
 
 ```lua
 -- @if(?(x)) evaluates x in the model, and then checks if the result is a valid template name
 -- this example also demonstrates using dynamically evalutated template application:
-local temp = {
+local temp = Lust{
 	[[@if(?(op))<(op)>]],
 	child = "I am a child",
 }
-local model = { op="child" }
--- res: "I am a child"
+temp:gen{ op="child" } -- res: "I am a child"
 ```
 
 ```lua
 -- using else and inline templates:
-local temp = [[@if(x)<{{hello}}>else<{{bye bye}}>]]
-local model = { x=1 }	-- res: "hello"
-local mdoel = {  }		-- res: "bye bye"
+local temp = Lust[[@if(x)<{{hello}}>else<{{bye bye}}>]]
+temp:gen{ x=1 }	-- res: "hello"
+temp:gen{  }	-- res: "bye bye"
 ```
 
 ```lua
 -- @if(#x > n) tests that the number of items in the model term 'x' is greater than n:
-local temp = [[@if(#. > "0")<{{at least one}}>]]
-local model = { "a", }	-- res: "at least one")
-local model = {  } 		-- res: ""
+local temp = Lust[[@if(#. > "0")<{{at least one}}>]]
+temp:gen{ "a" }	-- res: "at least one")
+temp:gen{  } 	-- res: ""
 ```
 
 ```lua
 -- compound conditions:
-local temp = [[@if(#x > "0" and #x < "5")<{{success}}>]]
-local model = { x={ "a", "b", "c", "d" } }		-- res: "success"
-local model = { x={ "a", "b", "c", "d", "e" } }	-- res: ""
-local model = { x={  } }						-- res: ""
-local model = { }								-- res: ""
+local temp = Lust[[@if(#x > "0" and #x < "5")<{{success}}>]]
+temp:gen{ x={ "a", "b", "c", "d" } }		-- res: "success"
+temp:gen{ x={ "a", "b", "c", "d", "e" } }	-- res: ""
+temp:gen{ x={  } }							-- res: ""
+temp:gen{ }									-- res: ""
 ```
 
 ```lua
 -- compound conditions:
-local temp = [[@if(x or not not not y)<{{success}}>else<{{fail}}>]]
-local model = { x=1 }		-- res: "success"
-local model = { x=1, y=1 }	-- res: "success"
-local model = { y=1 }		-- res: "fail"
-local model = { }			-- res: "success"
+local temp = Lust[[@if(x or not not not y)<{{success}}>else<{{fail}}>]]
+temp:gen{ x=1 }			-- res: "success"
+temp:gen{ x=1, y=1 }	-- res: "success"
+temp:gen{ y=1 }			-- res: "fail"
+temp:gen{ }				-- res: "success"
 ```
 
 ```lua
 -- compound conditions:
-local temp = [[@if(n*"2"+"1" > #x)<{{success}}>else<{{fail}}>]]
-local model = { n=3, x = { "a", "b", "c" } }	-- res: "success"
-local model = { n=1, x = { "a", "b", "c" } }	-- res: "fail"
+local temp = Lust[[@if(n*"2"+"1" > #x)<{{success}}>else<{{fail}}>]]
+temp:gen{ n=3, x = { "a", "b", "c" } }	-- res: "success"
+temp:gen{ n=1, x = { "a", "b", "c" } }	-- res: "fail"
 ```
 
 
@@ -266,8 +265,8 @@ Lust has two main methods for creating iteration statements: a map function and 
 
 ```lua
 -- @map can iterate over arrays in the environment:
-local temp = [[@map{ n=numbers }:{{$n.name }}]]
-local model = {
+local temp = Lust[[@map{ n=numbers }:{{$n.name }}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -279,8 +278,8 @@ local model = {
 
 ```lua
 -- assigning mapped values a name in the environment
-local temp = [[@map{ n=numbers }:{{$n }}]]
-local model = {
+local temp = Lust[[@map{ n=numbers }:{{$n }}]]
+temp:gen{
 	numbers = { "one", "two", "three" }
 }
 -- result: "one two three "
@@ -288,8 +287,8 @@ local model = {
 
 ```lua
 -- the _separator field can be used to insert elements between items:
-local temp = [[@map{ n=numbers, _separator=", " }:{{$n.name}}]]
-local model = {
+local temp = Lust[[@map{ n=numbers, _separator=", " }:{{$n.name}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -301,8 +300,8 @@ local model = {
 
 ```lua
 -- _ can be used as a shorthand for _separator:
-local temp = [[@map{ n=numbers, _=", " }:{{$n.name}}]]
-local model = {
+local temp = Lust[[@map{ n=numbers, _=", " }:{{$n.name}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -314,8 +313,8 @@ local model = {
 
 ```lua
 -- a map can iterate over multiple arrays in parallel
-local temp = [[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
-local model = {
+local temp = Lust[[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -330,8 +329,8 @@ local model = {
 
 ```lua
 -- if parallel mapped items have different lengths, the longest is used:
-local temp = [[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
-local model = {
+local temp = Lust[[@map{ a=letters, n=numbers, _=", " }:{{$a $n.name}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -346,8 +345,8 @@ local model = {
 
 ```lua
 -- if parallel mapped items are not arrays, they are repeated each time:
-local temp = [[@map{ a=letters, n=numbers, prefix="hello", count=#letters, _=", " }:{{$prefix $a $n.name of $count}}]]
-local model = {
+local temp = Lust[[@map{ a=letters, n=numbers, prefix="hello", count=#letters, _=", " }:{{$prefix $a $n.name of $count}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -362,8 +361,8 @@ local model = {
 
 ```lua
 -- the 'i1' and 'i0' fields are added automatically for one- and zero-based array indices:
-local temp = [[@map{ n=numbers }:{{$i0-$i1 $n.name }}]]
-local model = {
+local temp = Lust[[@map{ n=numbers }:{{$i0-$i1 $n.name }}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -375,18 +374,16 @@ local model = {
 
 ```lua
 -- if the map only contains an un-named array, each item of the array becomes the environment applied in each iteration:
-local temp = [["@map{ ., _separator='", "' }:{{$name}}"]]
-local model = {
+local temp = Lust[["@map{ ., _separator='", "' }:{{$name}}"]]
+temp:gen{
 	{ name="one" },
 	{ name="two" },
 	{ name="three" },
 }
 -- res: '"one", "two", "three"'
-```
 
-```lua
-local temp = [[@map{ numbers, count=#numbers, _separator=", " }:{{$name of $count}}]]
-local model = {
+local temp = Lust[[@map{ numbers, count=#numbers, _separator=", " }:{{$name of $count}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
@@ -396,46 +393,103 @@ local model = {
 -- res: "one of 3, two of 3, three of 3"
 ```
 
-
-The @iter function takes a numeric argument and applies a template so many times.
+```lua
+-- @rest is like @map, but starts from the 2nd item:
+local temp = Lust[[@rest{ a=letters, n=numbers, _separator=", " }:{{$a $n.name}}]]
+temp:gen{
+	numbers = {
+		{ name="one" },
+		{ name="two" },
+		{ name="three" },
+	},
+	letters = {
+		"a", "b", "c",
+	}
+}
+-- res: "b two, c three"
+```
 
 ```lua
--- model used in the following examples
-local model = {
+-- @iter can be used for an explicit number of repetitions:
+local temp = Lust[[@iter{ "3" }:{{repeat $i1 }}]]
+temp:gen{} -- res: "repeat 1 repeat 2 repeat 3 "
+```
+
+```lua
+-- again, _separator works:
+local temp = Lust[[@iter{ "3", _separator=", " }:{{repeat $i1}}]]
+temp:gen{} -- res: "repeat 1, repeat 2, repeat 3"
+```
+
+```lua
+-- @iter can take an array item; it will use the length of that item:
+local temp = Lust[[@iter{ numbers, _separator=", " }:{{repeat $i1}}]]
+temp:gen{
 	numbers = {
 		{ name="one" },
 		{ name="two" },
 		{ name="three" },
 	}
 }
-```
-
-```lua
--- @iter can be used for an explicit number of repetitions:
-local temp = [[@iter{ "3" }:{{repeat $i1 }}]]
--- res: "repeat 1 repeat 2 repeat 3 "
-```
-
-```lua
--- again, _separator works:
-local temp = [[@iter{ "3", _separator=", " }:{{repeat $i1}}]]
 -- res: "repeat 1, repeat 2, repeat 3"
-```
 
-```lua
--- @iter can take an array item; it will use the length of that item:
-local temp = [[@iter{ numbers, _separator=", " }:{{repeat $i1}}]]
--- res: "repeat 1, repeat 2, repeat 3"
 ```
 
 ```lua
 -- @iter can take a range for start and end values:
-local temp = [[@iter{ ["2", "3"] }:{{repeat $i1 }}]]
+Lust([[@iter{ ["2", "3"] }:{{repeat $i1 }}]]):gen{}
 -- res: "repeat 2 repeat 3 "
 ```
 
 ```lua
--- the range can also be determined by an array whose length gets used
-local temp = [[@iter{ ["2", numbers], _separator=", " }:{{repeat $i1}}]]
+local temp = Lust[[@iter{ ["2", numbers], _separator=", " }:{{repeat $i1}}]]
+temp:gen{
+	numbers = {
+		{ name="one" },
+		{ name="two" },
+		{ name="three" },
+	}
+}
 -- res: "repeat 2, repeat 3"
+```
+
+### Indentation
+If template application is preceded by only whitespace on a given line, every line the template generates will be indented to the same level as the template application.
+
+```lua
+-- helper function to un-escape \n and \t in Lua's long string
+local function nl(str) return string.gsub(str, [[\n]], "\n"):gsub([[\t]], "\t") end
+
+-- if a template application occurs after whitespace indentation, 
+-- any generated newlines will repeat this indentation:
+local temp = Lust{nl[[
+	@iter{ "3", _separator="\n" }:child]],
+	child = [[line $i1]],
+}
+--[=[ res: [[
+	line 1
+	line 2
+	line 3]]
+--]=]
+```
+
+
+### Handler Registration
+For special cases, handlers can be associated with a template for runtime modification of the template's environment.
+
+```lua
+-- a handler can be registered for a named template
+-- the handler allows a run-time modification of the environment:
+local temp = Lust{
+	[[@child]],
+	child = [[$1]],
+}
+local model = { "foo" }
+local function double_env(env)
+	-- create a new env:
+	local ee = env[1] .. env[1]
+	return { ee }
+end
+temp:register("child", double_env)
+-- res: "foofoo"
 ```
