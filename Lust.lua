@@ -1115,10 +1115,9 @@ local function concat(t, sep)
 end
 -- need this because #s returns string length rather than numeric value:
 local function len(t)
-	if type(t) == "table" then
-		return #t
-	else
-		return tonumber(t) or 0
+	if type(t) == "table"
+		then return #t
+		else return 0
 	end
 end
 
