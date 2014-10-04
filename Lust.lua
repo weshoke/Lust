@@ -70,7 +70,7 @@ local gensym = (function()
 	local id = 0
 	return function(s)
 		id = id + 1
-		pre = s or "v"
+		local pre = s or "v"
 		return format("%s%d", pre, id)
 	end
 end)()
@@ -277,7 +277,7 @@ local grammar = P{
 							"iter"
 						)
 						+ Rule(
-							P"@" * (C"map" + C"rest") * 
+							P"@" * (C"map" + C"rest" + C"first" + C"last") * 
 							(V"env_dict" + V"env") * P":" * V"iter_body", 
 							"map"
 						)
@@ -785,6 +785,11 @@ function action:map(node, out)
 	
 	if ty == "rest" then
 		start = "2"
+	elseif ty == "first" then
+		start = "1"
+		len = string.format("math.min(1, %s)", len)
+	elseif ty == "last" then
+		start = len
 	else -- map
 		start = "1"
 	end
@@ -1087,6 +1092,7 @@ end
 -- because %q also quotes escape sequences, which isn't what we want:
 function action:literal(node, out)
 	local s = node[1]
+	local q
 	if s:find('"') then
 		q = format('[[%s]]', s)
 	else
@@ -1115,9 +1121,10 @@ local function concat(t, sep)
 end
 -- need this because #s returns string length rather than numeric value:
 local function len(t)
-	if type(t) == "table"
-		then return #t
-		else return 0
+	if type(t) == "table" then
+		return #t
+	else
+		return tonumber(t) or 0
 	end
 end
 
@@ -1309,9 +1316,11 @@ function gen:gen(model, rulename)
 			print("template internal error", err)
 		end
 		
-		-- store internally for subsequent use:
-		-- (using rawset here because of gen:__newindex)
-		rawset(self, "rules",  assert( f(self), "construct error" ) )
+		-- merge new rules with existing rules
+		local rules = assert( f(self), "construct error" ) 
+		for k, v in pairs(rules) do
+			self.rules[k] = v
+		end
 		
 		-- now try again:
 		g = self.rules[rulename]
