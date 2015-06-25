@@ -67,7 +67,7 @@ Lust[[$a.1 $1.b]]:gen{ a={ "hello" }, { b="world" } } -- res: "hello world"
 ```lua
 -- the # symbol prints the length of an environment selection:
 Lust[[$#.]]:gen{ 1, 2, 3 } -- res: "3"
-Lust:[[$#foo.bar]]:gen{ foo={ bar={ 1, 2, 3 } } } -- res: "3"
+Lust[[$#foo.bar]]:gen{ foo={ bar={ 1, 2, 3 } } } -- res: "3"
 ```
 
 ```lua
@@ -138,7 +138,7 @@ Lust{
 Lust{
 	[[@1:child @two:child]],
 	child = [[$. child]],
-}:{ "one", two="two" } -- res: "one child two child"
+}:gen{ "one", two="two" } -- res: "one child two child"
 ```
 
 ```lua
@@ -152,7 +152,7 @@ Lust{
 ```lua
 -- subtemplate paths can mix static and dynamic terms:
 Lust{[[@child.(x), @(y).grandchild, @(a.b)]], 
-	child "$1 to child",
+	child ="$1 to child",
 	["child.grandchild"] = "$1 to grandchild",
 }:gen{ 
 	x="grandchild", 
